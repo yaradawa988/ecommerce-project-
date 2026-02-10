@@ -65,6 +65,16 @@ class User extends Authenticatable
 }
 
 
+public function permissions()
+{
+    return $this->roles()
+        ->with('permissions')
+        ->get()
+        ->pluck('permissions')
+        ->flatten()
+        ->unique('id');
+}
+
 public function hasRole(string $role): bool
 {
     return $this->roles()->where('slug', $role)->exists();

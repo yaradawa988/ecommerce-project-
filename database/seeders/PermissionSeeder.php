@@ -18,6 +18,10 @@ class PermissionSeeder extends Seeder
             ['name' => 'Delete Product', 'slug' => 'product.delete'],
             ['name' => 'View Orders', 'slug' => 'order.view'],
             ['name' => 'Update Order Status', 'slug' => 'order.update'],
+            ['name' => 'View Categories', 'slug' => 'category.view'],
+            ['name' => 'Create Category', 'slug' => 'category.create'],
+            ['name' => 'Update Category', 'slug' => 'category.update'],
+            ['name' => 'Delete Category', 'slug' => 'category.delete'],
         ];
 
         foreach ($permissions as $permission) {

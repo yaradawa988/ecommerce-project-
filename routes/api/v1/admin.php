@@ -1,21 +1,21 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-//use App\Http\Controllers\Api\Admin\DashboardController;
-//use App\Http\Controllers\Api\Admin\ProductController;
+use App\Http\Controllers\Api\V1\CategoryController;
+
 
   // ================= Admin =================
-        Route::prefix('admin')->middleware('check.ability:admin.access')->group(function () {
-            //Route::get('dashboard', [DashboardController::class, 'index']);
-
-            // Example product routes
-            //Route::post('products', [\App\Http\Controllers\Api\Admin\ProductController::class, 'store'])
-              //  ->middleware('check.ability:product.create');
-
-           // Route::put('products/{product}', [\App\Http\Controllers\Api\Admin\ProductController::class, 'update'])
-              //  ->middleware('check.ability:product.update');
-
-            //Route::delete('products/{product}', [\App\Http\Controllers\Api\Admin\ProductController::class, 'destroy'])
-               // ->middleware('check.ability:product.delete');
-        });
-    
+Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
+    Route::prefix('categories')->group(function () {
+        // List all categories
+        Route::get('/', [CategoryController::class, 'index'])->middleware('check.ability:category.view');
+        // Create a new category
+        Route::post('/', [CategoryController::class, 'store'])->middleware('check.ability:category.create');
+        // Show a single category
+        Route::get('/{category}', [CategoryController::class, 'show']);
+        // Update a category
+        Route::put('/{category}', [CategoryController::class, 'update'])->middleware('check.ability:category.update');
+        // Delete a category
+        Route::delete('/{category}', [CategoryController::class, 'destroy'])->middleware('check.ability:category.delete');
+    });
+});

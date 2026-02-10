@@ -5,48 +5,47 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
-//use Illuminate\Validation\ValidationException;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+
 class AuthController extends Controller
 {
+    /**
+     * @OA\Post(
+     *     path="/auth/register",
+     *     summary="Register new customer",
+     *     tags={"Authentication"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name","email","password","password_confirmation"},
+     *             @OA\Property(property="name", type="string", example="John Doe"),
+     *             @OA\Property(property="email", type="string", example="user@example.com"),
+     *             @OA\Property(property="password", type="string", example="P@ssw0rd123"),
+     *             @OA\Property(property="password_confirmation", type="string", example="P@ssw0rd123")
+     *         )
+     *     ),
+     *     @OA\Response(response=201, description="User registered successfully"),
+     *     @OA\Response(response=422, description="Validation error")
+     * )
+     */
     public function register(Request $request)
     {
         $data = $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-                'regex:/^[a-zA-Z\s]+$/'
-            ],
-            'email' => [
-                'required',
-                'email:rfc,dns',
-                'max:255',
-                'unique:users,email'
-            ],
-            'password' => [
-                'required',
-                'confirmed',
-                Rules\Password::min(8)
-                    ->letters()
-                    ->numbers()
-                    ->symbols()
-            ],
+            'name' => ['required','string','max:255','regex:/^[a-zA-Z\s]+$/'],
+            'email' => ['required','email:rfc,dns','max:255','unique:users,email'],
+            'password' => ['required','confirmed', Rules\Password::min(8)->letters()->numbers()->symbols()],
         ]);
 
         $user = User::create([
             ...$data,
             'password' => Hash::make($data['password']),
-           
         ]);
 
-         // Assign default role: customer
         $customerRole = \App\Models\Role::where('slug', 'customer')->first();
         $user->roles()->attach($customerRole);
 
-        // Generate token with abilities
         $token = $this->createToken($user);
 
         return response()->json([
@@ -55,8 +54,23 @@ class AuthController extends Controller
         ], 201);
     }
 
-
-        // ================= Login =================
+    /**
+     * @OA\Post(
+     *     path="/auth/login",
+     *     summary="Login user",
+     *     tags={"Authentication"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email","password"},
+     *             @OA\Property(property="email", type="string", example="user@example.com"),
+     *             @OA\Property(property="password", type="string", example="P@ssw0rd123")
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Successful login"),
+     *     @OA\Response(response=401, description="Unauthorized")
+     * )
+     */
     public function login(Request $request)
     {
         $request->validate([
@@ -69,20 +83,32 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
-
-        // Delete previous tokens
         $user->tokens()->delete();
 
-        $token = $this->createToken($user);
+       // اجمع صلاحيات المستخدم من roles -> permissions
+$abilities = $user->roles
+    ->flatMap(fn($role) => $role->permissions->pluck('slug'))
+    ->unique()
+    ->values()
+    ->toArray();
 
-        return response()->json([
-            'token' => $token->plainTextToken,
-            'user' => $user->load('roles.permissions'),
-        ]);
-    }
+$token = $user->createToken('access-token', $abilities)->plainTextToken;
 
+return response()->json([
+    'token' => $token,
+    'user' => $user->load('roles.permissions'),
+]);}
 
-       public function logout(Request $request)
+    /**
+     * @OA\Post(
+     *     path="/auth/logout",
+     *     summary="Logout user",
+     *     tags={"Authentication"},
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(response=200, description="Logged out")
+     * )
+     */
+    public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
 
@@ -91,24 +117,13 @@ class AuthController extends Controller
         ]);
     }
 
- private function createToken(User $user)
+    private function createToken(User $user)
     {
-        // Gather abilities from all roles
         $abilities = $user->roles
             ->flatMap(fn($role) => $role->permissions->pluck('slug'))
             ->unique()
             ->toArray();
 
-        return $user->createToken(
-            'api-token',
-            $abilities,
-            now()->addDays(7) // Expire in 7 days
-        );
+        return $user->createToken('api-token', $abilities, now()->addDays(7));
     }
-
-
-
-    
- 
-
 }

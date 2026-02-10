@@ -21,7 +21,7 @@ class Role extends Model
 {
     return $this->belongsToMany(
         Permission::class,
-        'role_permission' // 👈 اسم الجدول الصحيح
+        'role_permission' 
     );
 }
 

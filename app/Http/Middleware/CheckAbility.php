@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use App\Helpers\ApiResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckAbility
@@ -18,17 +19,17 @@ class CheckAbility
      */
     public function handle(Request $request, Closure $next, string $ability)
     {
-        $user = $request->user();
+       $user = $request->user();
 
         if (!$user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+            return ApiResponse::error('Unauthorized', 401);
         }
 
-        // تحقق من أن الـ user يمتلك الـ ability
-        if (!$user->hasAbility($ability)) {
-            return response()->json(['message' => 'Forbidden'], 403);
+        if (!$user->tokenCan($ability)) {
+            return ApiResponse::error('Forbidden: Missing ability: ' . $ability, 403);
         }
 
+    
         return $next($request);
     }
 }
