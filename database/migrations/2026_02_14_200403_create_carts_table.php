@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('roles', function (Blueprint $table) {
+        Schema::create('carts', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique(); // admin, customer, manager
-            $table->string('slug')->unique(); // ADMIN, CUSTOMER, MANGER 
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('session_id')->nullable(); // For guest carts
+            $table->decimal('total', 10, 2)->default(0);
             $table->timestamps();
         });
     }
@@ -24,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('roles');
+        Schema::dropIfExists('carts');
     }
 };

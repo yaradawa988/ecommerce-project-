@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('roles', function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->unique(); // admin, customer, manager
-            $table->string('slug')->unique(); // ADMIN, CUSTOMER, MANGER 
+        Schema::create('activity_logs', function (Blueprint $table) {
+           $table->id();
+            $table->foreignId('admin_id')->constrained('users')->cascadeOnDelete();
+            $table->string('action');
+            $table->string('ip')->nullable();
+            $table->json('metadata')->nullable();
             $table->timestamps();
         });
     }
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('roles');
+        Schema::dropIfExists('activity_logs');
     }
 };

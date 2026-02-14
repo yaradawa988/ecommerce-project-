@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('roles', function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->unique(); // admin, customer, manager
-            $table->string('slug')->unique(); // ADMIN, CUSTOMER, MANGER 
-            $table->timestamps();
+        Schema::table('users', function (Blueprint $table) {
+           $table->boolean('is_active')->default(true)->after('profile_image');
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('roles');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('is_active');
+        });
     }
 };

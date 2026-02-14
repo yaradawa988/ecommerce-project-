@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class ProductImage extends Model
 {
    use HasFactory;
+public $timestamps = false;
 
     protected $fillable = [
         'product_id',

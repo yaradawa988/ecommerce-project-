@@ -8,7 +8,7 @@ use App\Models\User;
 use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-
+use App\Helpers\ApiResponse;
 class AuthController extends Controller
 {
     /**
@@ -85,12 +85,16 @@ class AuthController extends Controller
         $user = Auth::user();
         $user->tokens()->delete();
 
-       // اجمع صلاحيات المستخدم من roles -> permissions
+    
 $abilities = $user->roles
     ->flatMap(fn($role) => $role->permissions->pluck('slug'))
     ->unique()
     ->values()
     ->toArray();
+
+    if (!$user->is_active) {
+    return ApiResponse::error('Your account is deactivated. Contact support.', 403);
+}
 
 $token = $user->createToken('access-token', $abilities)->plainTextToken;
 

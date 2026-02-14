@@ -4,20 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-class OrderItem extends Model
+class Shipment extends Model
 {
-    
-   use HasFactory;
+     use HasFactory;
 
     protected $fillable = [
         'order_id',
-        'product_variant_id',
-        'price',
-        'quantity',
+        'tracking_number',
+        'carrier',
+        'status',
+        'shipped_at',
+        'delivered_at',
     ];
 
     protected $casts = [
-        'price' => 'float',
+        'shipped_at' => 'datetime',
+        'delivered_at' => 'datetime',
     ];
 
     /* ================== Relationships ================== */
@@ -25,10 +27,5 @@ class OrderItem extends Model
     public function order()
     {
         return $this->belongsTo(Order::class);
-    }
-
-    public function variant()
-    {
-        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
     }
 }

@@ -23,6 +23,8 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'profile_image',
+        'is_active',
     ];
 
     /**
@@ -51,9 +53,31 @@ class User extends Authenticatable
 
      /* ================== Relationships ================== */
 
-    public function orders()
+   public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function cart()
+    {
+        return $this->hasOne(Cart::class);
+    }
+
+    public function coupons()
+    {
+        return $this->belongsToMany(Coupon::class, 'coupon_user')
+                    ->withPivot('order_id')
+                    ->withTimestamps();
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(NotificationCustom::class);
+    }
+
+    public function activityLogs()
+    {
+        return $this->hasMany(ActivityLog::class, 'admin_id');
     }
 
  public function roles()

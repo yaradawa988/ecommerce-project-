@@ -4,20 +4,25 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-class OrderItem extends Model
+class Invoice extends Model
 {
     
    use HasFactory;
 
     protected $fillable = [
         'order_id',
-        'product_variant_id',
-        'price',
-        'quantity',
+        'invoice_number',
+        'subtotal',
+        'discount',
+        'shipping_cost',
+        'total',
     ];
 
     protected $casts = [
-        'price' => 'float',
+        'subtotal' => 'float',
+        'discount' => 'float',
+        'shipping_cost' => 'float',
+        'total' => 'float',
     ];
 
     /* ================== Relationships ================== */
@@ -27,8 +32,8 @@ class OrderItem extends Model
         return $this->belongsTo(Order::class);
     }
 
-    public function variant()
+    public function items()
     {
-        return $this->belongsTo(ProductVariant::class, 'product_variant_id');
+        return $this->hasMany(InvoiceItem::class);
     }
 }

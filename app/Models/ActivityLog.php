@@ -4,26 +4,25 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-class Payment extends Model
+class ActivityLog extends Model
 {
    use HasFactory;
 
     protected $fillable = [
-        'order_id',
-        'provider',
-        'transaction_id',
-        'status',
-        'payload',
+        'admin_id',
+        'action',
+        'ip',
+        'metadata',
     ];
 
     protected $casts = [
-        'payload' => 'array',
+        'metadata' => 'array',
     ];
 
     /* ================== Relationships ================== */
 
-    public function order()
+    public function admin()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(User::class, 'admin_id');
     }
 }

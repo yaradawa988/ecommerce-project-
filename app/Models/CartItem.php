@@ -4,16 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-class OrderItem extends Model
+class CartItem extends Model
 {
-    
-   use HasFactory;
+  use HasFactory;
 
     protected $fillable = [
-        'order_id',
+        'cart_id',
         'product_variant_id',
-        'price',
         'quantity',
+        'price',
     ];
 
     protected $casts = [
@@ -22,13 +21,12 @@ class OrderItem extends Model
 
     /* ================== Relationships ================== */
 
-    public function order()
+    public function cart()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Cart::class);
     }
 
     public function variant()
     {
         return $this->belongsTo(ProductVariant::class, 'product_variant_id');
-    }
-}
+    }}

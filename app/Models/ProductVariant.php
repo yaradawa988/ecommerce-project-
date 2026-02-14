@@ -20,6 +20,7 @@ class ProductVariant extends Model
     protected $casts = [
         'weight' => 'float',
         'price' => 'float',
+        'weight' => 'float',
     ];
 
     /* ================== Relationships ================== */
